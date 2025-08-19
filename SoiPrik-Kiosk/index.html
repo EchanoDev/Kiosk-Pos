@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <link rel="shortcut icon" href="assets/logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Soi Prik - Thai Cuisine</title>
+  </head>
+  <body>
+    <!-- Attract / Idle Screen -->
+    <section
+      id="attract"
+      class="attract hidden"
+      role="region"
+      aria-label="Attract screen"
+    >
+      <div class="attract-inner">
+        <h1>Tap to Order</h1>
+        <p class="sub">Fresh. Fast. Yours.</p>
+        <button id="startOrdering" class="btn btn-primary btn-xl">
+          Start Order
+        </button>
+      </div>
+    </section>
+    <!-- Main Kiosk UI -->
+    <div id="app" class="app" aria-live="polite">
+      <header class="app-header">
+        <div class="brand">
+          <img src="assets/logo.png" />
+          <span>Soi Prik - Thai Authentic Foods</span>
+        </div>
+        <div class="order-tools">
+          <button id="btnLanguage" class="btn btn-ghost">EN</button>
+          <button
+            id="btnFull"
+            class="btn btn-ghost"
+            aria-label="Toggle fullscreen"
+          >
+            ⤢
+          </button>
+        </div>
+      </header>
+      <main class="layout">
+        <!-- Category Filters -->
+        <aside class="categories" aria-label="Categories">
+          <button class="chip active" data-cat="all">All</button>
+          <button class="chip" data-cat="curry">Curry</button>
+          <button class="chip" data-cat="noodles">Noodles</button>
+          <button class="chip" data-cat="soup">Soup</button>
+          <button class="chip" data-cat="desserts">Dessert</button>
+          <button class="chip" data-cat="drinks">Drinks</button>
+        </aside>
+        <!-- Menu Grid -->
+        <section class="menu" id="menu" aria-label="Menu items">
+          <!-- Cards injected by JS -->
+        </section>
+        <!-- Cart / Summary Panel -->
+        <aside class="cart" aria-label="Order summary">
+          <div class="cart-header">
+            <h2>Order</h2>
+            <button id="btnClear" class="btn btn-ghost">Clear</button>
+          </div>
+          <ul id="cartList" class="cart-list" aria-live="polite"></ul>
+          <div class="note">
+            <label for="orderNote">Notes</label>
+            <textarea
+              id="orderNote"
+              placeholder="Add Notes"
+              rows="2"
+            ></textarea>
+          </div>
+          <div class="totals">
+            <div class="row">
+              <span>Subtotal</span><strong id="tSubtotal">₱0.00</strong>
+            </div>
+            <div class="row">
+              <span>Tax (12%)</span><strong id="tTax">₱0.00</strong>
+            </div>
+            <div class="row grand">
+              <span>Total</span><strong id="tTotal">₱0.00</strong>
+            </div>
+          </div>
+          <button id="btnCheckout">Checkout</button>
+        </aside>
+      </main>
+      <footer class="app-footer">
+        <div class="kbd">Tap items to add • Long-press to edit</div>
+        <div id="clock" class="clock"></div>
+      </footer>
+    </div>
+    <!-- Payment Modal -->
+    <div
+      id="paymentModal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payTitle"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="payTitle">Choose Payment</h3>
+          <button class="btn btn-ghost" data-close>✕</button>
+        </div>
+        <div class="modal-body grid2">
+          <button class="btn btn-outline btn-lg" data-pay="cash">Cash</button>
+          <button class="btn btn-outline btn-lg" data-pay="card">Card</button>
+        </div>
+      </div>
+    </div>
+    <!-- Cash Modal -->
+    <div
+      id="cashModal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cashTitle"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="cashTitle">Cash Payment</h3>
+          <button class="btn btn-ghost" data-close>✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="cash-row">
+            <div>
+              <div class="row">
+                <span>Amount Due</span> <strong id="cashDue">₱0.00</strong>
+              </div>
+              <div class="row">
+                <span>Amount Tendered</span>
+                <strong id="cashTendered">₱0.00</strong>
+              </div>
+              <div class="row grand">
+                <span>Change</span> <strong id="cashChange">₱0.00</strong>
+              </div>
+            </div>
+            <div class="keypad" role="application" aria-label="Cash keypad">
+              <div class="display" id="keypadDisplay">0.00</div>
+              <div class="keys">
+                <button data-k="7">7</button><button data-k="8">8</button
+                ><button data-k="9">9</button> <button data-k="4">4</button
+                ><button data-k="5">5</button><button data-k="6">6</button>
+                <button data-k="1">1</button><button data-k="2">2</button
+                ><button data-k="3">3</button> <button data-k="00">00</button
+                ><button data-k="0">0</button><button data-k=".">.</button>
+                <button data-k="clear" class="wide">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div class="quickcash">
+            <button class="chip" data-quick="50">₱50</button>
+            <button class="chip" data-quick="100">₱100</button>
+            <button class="chip" data-quick="200">₱200</button>
+            <button class="chip" data-quick="500">₱500</button>
+            <button class="chip" data-quick="1000">₱1000</button>
+          </div>
+          <div class="modal-actions">
+            <button id="btnCashConfirm" class="btn btn-primary btn-lg" disabled>
+              Confirm & Print
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Card Modal -->
+    <div
+      id="cardModal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cardTitle"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="cardTitle">Card Payment</h3>
+          <button class="btn btn-ghost" data-close>✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="card-anim" id="cardAnim" aria-live="polite">
+            Insert / Tap your card…
+          </div>
+          <div class="modal-actions">
+            <button id="btnSimulateCard" class="btn btn-outline">
+              Simulate Tap
+            </button>
+            <button
+              id="btnCardApproved"
+              class="btn btn-primary btn-lg"
+              disabled
+            >
+              Approved • Print Receipt
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Order Complete / Receipt Screen (printable) -->
+    <section id="complete" class="complete hidden" aria-live="polite">
+      <div class="ticket" id="receipt">
+        <h1>Soi Prik</h1>
+        <p class="muted" id="rcptMeta">#0001 • —</p>
+        <div id="rcptLines"></div>
+        <hr />
+        <div class="row">
+          <span>Subtotal</span><strong id="rSubtotal">₱0.00</strong>
+        </div>
+        <div class="row"><span>Tax</span><strong id="rTax">₱0.00</strong></div>
+        <div class="row grand">
+          <span>Total</span><strong id="rTotal">₱0.00</strong>
+        </div>
+        <div id="rCash" class="r-cash hidden">
+          <div class="row">
+            <span>Tendered</span><strong id="rTendered">₱0.00</strong>
+          </div>
+          <div class="row">
+            <span>Change</span><strong id="rChange">₱0.00</strong>
+          </div>
+        </div>
+        <p class="muted">Thank you! Keep this receipt for your records.</p>
+      </div>
+      <div class="complete-actions">
+        <button id="btnNewOrder" class="btn btn-primary btn-xl">
+          New Order
+        </button>
+        <button id="btnPrint" class="btn">Print Again</button>
+      </div>
+    </section>
+
+    <script src="app.js"></script>
+  </body>
+</html>
